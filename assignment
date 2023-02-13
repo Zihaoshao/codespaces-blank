@@ -1,0 +1,49 @@
+import requests
+import nltk
+from nltk import FreqDist
+from nltk.tokenize import word_tokenize
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the two sources into variables
+source1_url = "https://www.gutenberg.org/files/16436/16436-h/16436-h.htm"
+source2_url = "https://www.gutenberg.org/files/10814/10814-h/10814-h.htm"
+
+# Retrieve the text from the two sources
+source1_response = requests.get(source1_url)
+source1_text = source1_response.text
+source2_response = requests.get(source2_url)
+source2_text = source2_response.text
+
+# Define a function to preprocess the data
+def preprocess(text):
+    # Tokenize the text into words
+    words = word_tokenize(text)
+    # Remove stop words, numbers, and punctuation
+    words = [word.lower() for word in words if word.isalpha() and word not in nltk.corpus.stopwords.words("english")]
+    return words
+
+# Preprocess the data from the two sources
+source1_words = preprocess(source1_text)
+source2_words = preprocess(source2_text)
+
+# Calculate the frequency distribution of the words in each source
+source1_freq = FreqDist(source1_words)
+source2_freq = FreqDist(source2_words)
+
+# Plot the frequency-rank plots for each source
+ranks1 = np.arange(1, len(source1_freq) + 1)
+frequencies1 = [count for (word, count) in source1_freq.most_common()]
+plt.loglog(ranks1, frequencies1, marker="o")
+plt.title("Frequency-Rank Plot for Source 1")
+plt.xlabel("Rank")
+plt.ylabel("Frequency")
+plt.show()
+
+ranks2 = np.arange(1, len(source2_freq) + 1)
+frequencies2 = [count for (word, count) in source2_freq.most_common()]
+plt.loglog(ranks2, frequencies2, marker="o")
+plt.title("Frequency-Rank Plot for Source 2")
+plt.xlabel("Rank")
+plt.ylabel("Frequency")
+plt.show()
